@@ -157,6 +157,10 @@ class AMStreamContinuity(ActionManager):
         if self.need_delay_init:
             self._init(player_state)
             self.need_delay_init = False
+            # Workaround: Kodi's video decoder does not reinitialize correctly after a DASH period
+            # change (ad -> content). A seek to the current position forces a fresh keyframe and
+            # restores video rendering (fixes black screen while audio continues).
+            xbmc.Player().seekTime(player_state['elapsed_seconds'])
         # Check if the audio stream is changed
         current_stream = self.current_streams['audio']
         player_stream = player_state.get(STREAMS['audio']['current'])
